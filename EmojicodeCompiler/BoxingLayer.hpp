@@ -10,7 +10,8 @@
 #define BoxingLayer_hpp
 
 #include "EmojicodeCompiler.hpp"
-#include "Type.hpp"
+#include "Types/Type.hpp"
+#include "FunctionType.hpp"
 #include "Function.hpp"
 
 namespace EmojicodeCompiler {
@@ -23,7 +24,7 @@ public:
                 const std::vector<Argument> &arguments, const Type &returnType, const SourcePosition &p)
     : Function(destinationFunction->protocolBoxingLayerName(protocolName), AccessLevel::Private, true,
                destinationFunction->owningType(), destinationFunction->package(), p, false, EmojicodeString(), false,
-               false, FunctionPAGMode::BoxingLayer), destinationReturnType_(destinationFunction->returnType),
+               false, FunctionType::BoxingLayer), destinationReturnType_(destinationFunction->returnType),
         destinationFunction_(destinationFunction) {
         setVtiProvider(provider);
         this->arguments = arguments;
@@ -40,7 +41,7 @@ public:
                 const std::vector<Argument> &arguments, const Type &returnType, const SourcePosition &p)
     : Function(EmojicodeString(), AccessLevel::Private, true,
                Type::callableIncomplete(), pkg, p, false, EmojicodeString(), false, false,
-               FunctionPAGMode::BoxingLayer), destinationArgumentTypes_(destinationArgumentTypes),
+               FunctionType::BoxingLayer), destinationArgumentTypes_(destinationArgumentTypes),
       destinationReturnType_(destinationReturnType) {
         setVtiProvider(&Function::pureFunctionsProvider);
         this->returnType = returnType;

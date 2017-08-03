@@ -8,14 +8,14 @@
 
 #include "PackageReporter.hpp"
 #include "../utf8.h"
-#include "Class.hpp"
+#include "Types/Class.hpp"
 #include "EmojicodeCompiler.hpp"
-#include "Enum.hpp"
+#include "Types/Enum.hpp"
 #include "Function.hpp"
-#include "Protocol.hpp"
-#include "TypeContext.hpp"
-#include "TypeDefinitionFunctional.hpp"
-#include "ValueType.hpp"
+#include "Types/Protocol.hpp"
+#include "Types/TypeContext.hpp"
+#include "Types/TypeDefinition.hpp"
+#include "Types/ValueType.hpp"
 #include <cstring>
 #include <list>
 #include <map>

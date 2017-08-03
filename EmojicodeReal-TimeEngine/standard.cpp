@@ -128,7 +128,7 @@ static void threadSleepMicroseconds(Thread *thread) {
 
 void threadStart(Thread *thread, RetainedObjectPointer callable) {
     thread->release(1);
-    executeCallableExtern(callable.unretainedPointer(), nullptr, 0, thread, nullptr);
+    executeCallableExtern(callable.unretainedPointer(), nullptr, 0, thread);
     ThreadsManager::deallocateThread(thread);
 }
 
@@ -170,7 +170,7 @@ void integerToString(Thread *thread) {
     bool negative = n < 0;
 
     EmojicodeInteger d = negative ? 2 : 1;
-    while (n /= base) {
+    while ((n /= base) != 0) {
         d++;
     }
 
@@ -184,7 +184,7 @@ void integerToString(Thread *thread) {
     EmojicodeChar *characters = string->characters() + d;
     do {
         *--characters =  "0123456789abcdefghijklmnopqrstuvxyz"[a % base % 35];
-    } while (a /= base);
+    } while ((a /= base) > 0);
 
     if (negative) {
         characters[-1] = '-';
@@ -448,6 +448,7 @@ FunctionFunctionPointer sLinkingTable[] = {
     initPrngWithoutSeed,
     prngIntegerUniform,
     prngDoubleUniform,
+    listAppendList,
 };
 
 void sPrepareClass(Class *klass, EmojicodeChar name) {

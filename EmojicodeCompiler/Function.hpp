@@ -10,12 +10,12 @@
 #define Function_hpp
 
 #include "CompilerError.hpp"
-#include "Token.hpp"
-#include "TokenStream.hpp"
-#include "Type.hpp"
-#include "FunctionPAGMode.hpp"
-#include "FunctionWriter.hpp"
-#include "Class.hpp"
+
+#include "Lex/TokenStream.hpp"
+#include "Types/Type.hpp"
+#include "FunctionType.hpp"
+#include "Generation/FunctionWriter.hpp"
+#include "Types/Class.hpp"
 #include <algorithm>
 #include <queue>
 #include <map>
@@ -26,6 +26,7 @@
 namespace EmojicodeCompiler {
 
 class VTIProvider;
+class ASTNode;
 
 enum class AccessLevel {
     Public, Private, Protected
@@ -40,19 +41,9 @@ struct Argument {
     Type type;
 };
 
-struct FunctionObjectVariableInformation : public ObjectVariableInformation {
-    FunctionObjectVariableInformation(int index, ObjectVariableType type, InstructionCount from, InstructionCount to)
-        : ObjectVariableInformation(index, type), from(from), to(to) {}
-    FunctionObjectVariableInformation(int index, int condition, ObjectVariableType type, InstructionCount from,
-                                      InstructionCount to)
-        : ObjectVariableInformation(index, condition, type), from(from), to(to) {}
-    int from;
-    int to;
-};
-
 /** Functions are callables that belong to a class or value type as either method, type method or initializer. */
 class Function {
-    friend void Class::finalize();
+    friend void Class::prepareForCG();
     friend Protocol;
     friend void generateCode(Writer &writer);
 public:
@@ -70,7 +61,7 @@ public:
 
     Function(EmojicodeString name, AccessLevel level, bool final, Type owningType, Package *package, SourcePosition p,
              bool overriding, EmojicodeString documentationToken, bool deprecated, bool mutating,
-             FunctionPAGMode mode)
+             FunctionType type)
     : position_(p),
     name_(name),
     final_(final),
@@ -81,7 +72,7 @@ public:
     owningType_(owningType),
     package_(package),
     documentation_(documentationToken),
-    compilationMode_(mode) {}
+    functionType_(type) {}
 
     EmojicodeString name() const { return name_; }
 
@@ -159,6 +150,9 @@ public:
     /// Returns the VTI this function was assigned.
     /// @throws std::logic_error if the function wasn’t assigned a VTI
     int getVti() const;
+
+    void setVti(int vti);
+
     void markUsed(bool addToCompilationQueue = true);
     /** Sets the @c VTIProvider which should be used to assign this method a VTI and to update the VTI counter. */
     void setVtiProvider(VTIProvider *provider);
@@ -170,37 +164,40 @@ public:
     /// Whether the function mutates the callee. Only relevant for value type instance methods.
     bool mutating() const { return mutating_; }
 
-    FunctionPAGMode compilationMode() const { return compilationMode_; }
+    FunctionType functionType() const { return functionType_; }
 
     virtual ContextType contextType() const {
-        switch (compilationMode()) {
-            case FunctionPAGMode::ObjectMethod:
-            case FunctionPAGMode::ObjectInitializer:
+        switch (functionType()) {
+            case FunctionType::ObjectMethod:
+            case FunctionType::ObjectInitializer:
                 return ContextType::Object;
                 break;
-            case FunctionPAGMode::ValueTypeMethod:
-            case FunctionPAGMode::ValueTypeInitializer:
+            case FunctionType::ValueTypeMethod:
+            case FunctionType::ValueTypeInitializer:
                 return ContextType::ValueReference;
                 break;
-            case FunctionPAGMode::ClassMethod:
-            case FunctionPAGMode::Function:
+            case FunctionType::ClassMethod:
+            case FunctionType::Function:
                 return ContextType::None;
                 break;
-            case FunctionPAGMode::BoxingLayer:
+            case FunctionType::BoxingLayer:
                 throw std::logic_error("contextType for BoxingLayer called on Function class");
         }
     }
+
+    void setAst(const std::shared_ptr<ASTNode> &ast) { ast_ = ast; }
+    const std::shared_ptr<ASTNode>& ast() const { return ast_; }
 
     int fullSize() const { return fullSize_; }
     void setFullSize(int c) { fullSize_ = c; }
 
     FunctionWriter writer_;
     std::vector<FunctionObjectVariableInformation>& objectVariableInformation() { return objectVariableInformation_; }
+    size_t variableCount() const { return variableCount_; }
+    void setVariableCount(size_t variableCount) { variableCount_ = variableCount; }
 private:
-    /** Sets the VTI to @c vti and enters this functions into the list of functions to be compiled into the binary. */
-    void setVti(int vti);
-
     TokenStream tokenStream_;
+    std::shared_ptr<ASTNode> ast_;
     SourcePosition position_;
     EmojicodeString name_;
     static int nextVti_;
@@ -216,17 +213,18 @@ private:
     Package *package_;
     EmojicodeString documentation_;
     VTIProvider *vtiProvider_ = nullptr;
-    FunctionPAGMode compilationMode_;
+    FunctionType functionType_;
     int fullSize_ = -1;
     std::vector<Function*> overriders_;
     std::vector<FunctionObjectVariableInformation> objectVariableInformation_;
+    size_t variableCount_ = 0;
 };
 
 class Initializer: public Function {
 public:
     Initializer(EmojicodeString name, AccessLevel level, bool final, Type owningType, Package *package,
                 SourcePosition p, bool overriding, EmojicodeString documentationToken, bool deprecated, bool r,
-                std::experimental::optional<Type> errorType, FunctionPAGMode mode)
+                std::experimental::optional<Type> errorType, FunctionType mode)
     : Function(name, level, final, owningType, package, p, overriding, documentationToken, deprecated, true, mode),
     required_(r),
     errorType_(errorType) {

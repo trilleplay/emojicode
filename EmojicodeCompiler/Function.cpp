@@ -9,9 +9,8 @@
 #include "Function.hpp"
 #include "CompilerError.hpp"
 #include "EmojicodeCompiler.hpp"
-#include "Lexer.hpp"
-#include "TypeContext.hpp"
-#include "VTIProvider.hpp"
+#include "Types/TypeContext.hpp"
+#include "Generation/VTIProvider.hpp"
 #include <algorithm>
 #include <map>
 #include <stdexcept>
@@ -22,7 +21,7 @@ bool Function::foundStart = false;
 Function *Function::start;
 int Function::nextVti_ = 0;
 std::queue<Function*> Function::compilationQueue;
-ValueTypeVTIProvider Function::pureFunctionsProvider;
+ValueTypeVTIProvider Function::pureFunctionsProvider(1);
 
 void Function::setLinkingTableIndex(int index) {
     linkingTableIndex_ = index;

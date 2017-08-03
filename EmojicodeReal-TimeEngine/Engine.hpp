@@ -25,8 +25,8 @@ public:
 
 class FunctionObjectVariableRecord : public ObjectVariableRecord {
 public:
-    int from;
-    int to;
+    unsigned int from;
+    unsigned int to;
 };
 
 struct BoxObjectVariableRecords {

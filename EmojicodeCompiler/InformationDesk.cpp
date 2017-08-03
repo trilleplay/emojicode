@@ -9,7 +9,7 @@
 #include "InformationDesk.hpp"
 
 #include "EmojicodeCompiler.hpp"
-#include "Lexer.hpp"
+#include "Lex/Lexer.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -30,7 +30,7 @@ void InformationDesk::sizeOfVariable(const std::string &string) {
         f = InformationDeskFunction::TypeMethod;
     }
 
-    auto parsedType = parseType();
+    auto parsedType = parseTypeIdentifier();
     Type type = Type::nothingness();
     if (!package_->fetchRawType(parsedType, false, &type)) {
         throw "no type";
@@ -40,13 +40,13 @@ void InformationDesk::sizeOfVariable(const std::string &string) {
     Function* function;
     switch (f) {
         case InformationDeskFunction::Initializer:
-            function = type.typeDefinitionFunctional()->lookupInitializer(name.value());
+            function = type.typeDefinition()->lookupInitializer(name.value());
             break;
         case InformationDeskFunction::Method:
-            function = type.typeDefinitionFunctional()->lookupMethod(name.value());
+            function = type.typeDefinition()->lookupMethod(name.value());
             break;
         case InformationDeskFunction::TypeMethod:
-            function = type.typeDefinitionFunctional()->lookupTypeMethod(name.value());
+            function = type.typeDefinition()->lookupTypeMethod(name.value());
             break;
     }
 
