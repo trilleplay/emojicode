@@ -14,9 +14,9 @@ magicsudod=$3
 if [[ "$magicsudod" == "magicsudod" ]]; then
   echo "I’ve super user privileges now and will try to perform the installation."
 else
-  echo "👨‍💻  Hi, I’m the Emojicode Installer!"
+  echo "Hi, I’m the Trilleplay Touch: Exi Installer!"
 
-  echo "I’ll copy the ${cyan}Emojicode Compiler${n} and ${magenta}Real-Time Engine${n} to ${binaries}.${n}"
+  echo "I’ll copy the ${cyan}Trilleplay Touch: Exi${n} and ${magenta}Real-Time Engine${n} to ${binaries}.${n}"
   echo "Then I’ll copy the packages to ${packages}.${n}"
 fi
 
@@ -79,7 +79,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
   if [ $? = 0 ]
   then
     tput setaf 2
-    echo "✅  Emojicode was successfully installed.${n}"
+    echo "Trilleplay Touch: exi was successfully installed.${n}"
   else
     echo "${r}Installation failed. Please refer to the error above.${n}"
     exit 1
