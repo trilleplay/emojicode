@@ -27,8 +27,8 @@ function offerSudo {
   if [ "$EUID" -eq 0 ]; then
     exit 1
   fi
-  echo "I can try to rerun myself with sudo."
-  read -p "If you wish me to do so type y. ➡️  " -n 1 -r
+  echo "I can try to rerun then installer as a super user."
+  read -p "If you wish me to do so type y." -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo ""
     sudo "$self" "$binaries" "$packages" magicsudod
@@ -37,7 +37,7 @@ function offerSudo {
   exit 1
 }
 
-read -p "If you want to proceed type y. ➡️  " -n 1 -r
+read -p "If you want to proceed type y." -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
   echo
   if [[ ! -w $binaries ]] ; then
@@ -48,7 +48,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
   if [[ ! -w $packages ]] ; then
     pp=$(dirname "$packages")
     if [[ ! -w $pp ]] ; then
-      echo "${r}${pp} is not writeable from this user.${n}"
+      echo "${r}${pp} is not writeable in this mode.${n}"
       offerSudo
     else
       if [[ ! -d $packages ]] ; then
@@ -66,10 +66,10 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     set -e
     echo "Copying builds${n}"
 
-    cp emojicode "$binaries/emojicode"
-    cp emojicodec "$binaries/emojicodec"
+    cp emojicode "$binaries/exi"
+    cp emojicodec "$binaries/exi"
 
-    chmod 755 "$binaries/emojicode" "$binaries/emojicodec"
+    chmod 755 "$binaries/exi" "$binaries/exi"
 
     echo "Copying packages${n}"
 
